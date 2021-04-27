@@ -31,14 +31,21 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+
 if [ -f "$ex_home/conf/env.sh" ]; then
   . "$ex_home"/conf/env.sh
 else
   . "$ex_home"/conf/env.sh.example
 fi
 
+source $ACCUMULO_HOME/conf/accumulo-env.sh
+
 # Build shaded jar (if not built already)
 "$ex_home"/bin/build
+echo "JAVA_OPTS"
+echo "${JAVA_OPTS[@]}"
+echo "-cp"
+echo "$EXAMPLES_JAR_PATH:${CLASSPATH}"
 
-java -cp $EXAMPLES_JAR_PATH -Dlog4j.configurationFile="$EXAMPLES_LOG4J" "org.apache.accumulo.examples.$1" ${*:2}
+java -Dsun.security.krb5.debug=true -Dlog4j.configurationFile="file:/home/azureuser/accumulo-examples/conf/log4j.properties" "${JAVA_OPTS[@]}" -cp "$EXAMPLES_JAR_PATH:${CLASSPATH}" "org.apache.accumulo.examples.$1" ${*:2}
 
